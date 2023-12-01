@@ -56,16 +56,14 @@
 
 
         // Handles the click event when a button is clicked on the game board
-        function play(event) {
+        function play(event, index) {
             if (!isButtonPressAllowed) {
                 return; // Exit early if button press is not allowed
             }
             console.log("Before move - currentPlayer:", currentPlayer);
+
             // Identify the clicked button
             const clickedButton = event.target;
-
-            // Get the index of the clicked button
-            const index = Array.from(clickedButton.parentNode.children).indexOf(clickedButton);
 
             // Check if the cell is empty and the game is not over
             if (board[index] === '' && !checkWin()) {
@@ -117,8 +115,8 @@
             ];
 
             for (const combo of winConditions) {
-                const [a, b, c] = combo; //after taking the arrays of winConditions, combo is converted to [a, b, c] per array. As in [a, b, c] =  [0, 1, 2] them [a, b, c] = [3, 4, 5] etc
-                console.log(`Checking combination: [A = ${a},B = ${b},C = ${c}]`); // debug checking combinations (a, b, c) inside the scope of the loop
+                const [a, b, c] = combo; //after taking the arrays of winConditions, combo is converted to [a, b, c] per array. As in [a, b, c] =  [0, 1, 2] then [a, b, c] = [3, 4, 5] etc
+                console.log(`Checking combination: [A = ${a},B = ${b},C = ${c}]`); // debug - checking combinations (a, b, c) inside the scope of the loop
                 if (board[a] !== '' && board[a] === board[b] && board[a] === board[c]) { // if the board positions a, b, c are not empty and are equal to each other then there is a win
                     // Change the color of the winning cells
                     document.getElementById(`grid${a}`).classList.replace('btn-primary', 'btn-danger');
@@ -141,22 +139,30 @@
             counter = 0;
             msg.innerHTML = `<h4>Board reset<br> <h2>Turn of player ${currentPlayer}`
 
-            // Reset button text to ''
-            // querySelectorAll is used to select all the buttons in the board
-            document.querySelectorAll('#board button').forEach(button => { button.innerText = ''; button.classList.replace('btn-danger', 'btn-primary'); });
-            // forEach method is used to loop through all the buttons in the ID #board and put the innerText back to ' ' and then the color class back to default with an arrow function
+            // querySelectorAll is used to select all the buttons on the board
+            let buttons = document.querySelectorAll('#board button');
+            for (let i = 0; i < buttons.length; i++) { // loop through all the buttons in the ID #board div (9)
+                let button = buttons[i];
+                button.innerText = '';  // Resets every button text to ''
+                button.classList.replace('btn-danger', 'btn-primary');  // Resets every button color class back to default
+            }
 
-            console.log("Board reset - currentPlayer:", currentPlayer); // debug log
+            // Alternative way with an arrow function and forEach method:
+            // document.querySelectorAll('#board button').forEach(button => { button.innerText = ''; button.classList.replace('btn-danger', 'btn-primary'); });
+            // forEach method is used to loop through all the buttons in the ID #board div and put the innerText back to ' ' and then the color class back to default with an arrow function
+
+            console.log("Button colors reset: ", buttons); // debug - button colors reset
+
+            console.log("Board reset - currentPlayer:", currentPlayer); // debug - board reset
         }
 
 
-
-        // Adds an event listeners to each grid button
+        // Adds event listeners to each grid button
         for (let i = 0; i < 9; i++) {
-            document.getElementById("grid" + i).addEventListener("click", play);
-            console.log("Grid " + i + " was checked."); // debug log checking that the event listeners were added to the grid buttons
+            const gridButton = document.getElementById("grid" + i);
+            gridButton.addEventListener("click", function (event) {play(event, i);}); // Adds an event listener to each grid button and whenever someone clicks on one the play function is called
+            console.log("Grid " + i + " was checked."); // debug log - checking that the event listeners were added to the grid buttons
         }
-
 
 
     </script>
